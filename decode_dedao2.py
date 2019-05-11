@@ -4,6 +4,7 @@ import os
 import re
 from mitmproxy import ctx
 from id_util import generate_id
+from parse_content import get_content_list
 
 def response(flow):
 
@@ -149,10 +150,12 @@ def response(flow):
 
 
         article_info = {}
+        ext_info = {}
         article_author_info = {}
         article_column_info = {}
         article_source_info = {}
         article_category_info = {}
+
 
 
         with open('temp_file/4.txt', 'rb') as f:
@@ -160,66 +163,90 @@ def response(flow):
 
         if _4_info and _4_info['c']['dd_article_id'] == content['data']['article']['Id']:
             #栏目信息嵌入
-            article_info['column_id'] = _4_info['c']['class_info']['product_id']
-            article_info['column_name'] = _4_info['c']['class_info']['name']
+            # article_info['column_id'] = generate_id(_4_info['c']['class_info']['name'])
+            # article_info['column_name'] = _4_info['c']['class_info']['name']
 
-            article_info['class_id'] = _4_info['c']['article_info']['class_id']
+            # article_info['class_id'] = _4_info['c']['article_info']['class_id']
+
+            # 文章id
             article_info['article_id'] = _4_info['c']['article_info']['id']
-            article_info['prev_article_id'] = _4_info['c']['prev_article_id']
-            article_info['next_article_id'] = _4_info['c']['next_article_id']
-            article_info['order_num'] = _4_info['c']['article_info']['order_num']
-
-            article_info['cover_image'] = _4_info['c']['article_info']['logo']
             article_info['article_name'] = _4_info['c']['article_info']['title']
-            article_info['chapter_id'] = _4_info['c']['article_info']['chapter_id']
+
+            #关联文章和作者
+            article_author_info['article_id'] = article_info['article_id']
+            article_author_info['author_id'] = generate_id(_4_info['c']['class_info']['lecturer_name'])
+            print('article_author_info: ' + json.dumps(article_author_info))
+
+            #关联文章和栏目
+            article_column_info['article_id'] = article_info['article_id']
+            article_column_info['column_id'] = generate_id(_4_info['c']['class_info']['name'])
+            print('article_column_info: ' + json.dumps(article_column_info))
+
+            # 关联文章和来源
+            article_source_info['article_id'] = article_info['article_id']
+            article_source_info['source_id'] = generate_id('https://www.igetget.com/')
+            print('article_source_info: ' + json.dumps(article_source_info))
+
+
+
+            # 正文是字符串，先进行loads
+
+            sub_content = json.loads(content['data']['content'])
+            # 正文解析
+            article_info['article_content'] = get_content_list(sub_content, _4_info)
+
+
+            #额外信息
+            ext_info['article_id'] = article_info['article_id']
+            ext_info['attribute_name'] = 'prev_article_id'
+            ext_info['attribute_value'] = _4_info['c']['prev_article_id']
+            #插入额外属性表
+            print('ext_info: ' + json.dumps(ext_info))
+
+            ext_info['attribute_name'] = 'next_article_id'
+            ext_info['attribute_value'] = _4_info['c']['next_article_id']
+            #插入额外属性表
+            print('ext_info: ' + json.dumps(ext_info))
+
+            ext_info['attribute_name'] = 'cover_image'
+            ext_info['attribute_value'] = _4_info['c']['article_info']['logo']
+            # 插入额外属性表
+            print('ext_info: ' + json.dumps(ext_info))
+
+            ext_info['attribute_name'] = 'article_learn_count'
+            ext_info['attribute_value'] = _4_info['c']['article_info']['cur_learn_count']
+            # 插入额外属性表
+            print('ext_info: ' + json.dumps(ext_info))
+
+            ext_info['attribute_name'] = 'audio_url'
+            ext_info['attribute_value'] = _4_info['c']['article_info']['audio']['mp3_play_url']
+            # 插入额外属性表
+            print('ext_info: ' + json.dumps(ext_info))
+
+            # article_info['article_learn_count'] = _4_info['c']['article_info']['cur_learn_count']
+            # article_info['audio_url'] = _4_info['c']['article_info']['audio']['mp3_play_url']
 
             #得到文章 章节名
             with open('temp_file/2.txt', 'rb') as f:
                 _2_info = pickle.load(f)
-            if article_info['column_id'] == _2_info['c']['class_info']['product_id']  and article_info['class_id'] == _2_info['c']['class_info']['id'] and _2_info['c']['class_info']['has_chapter'] == 1:
+            if generate_id(_4_info['c']['class_info']['name']) == _2_info['c']['class_info']['product_id']  and _4_info['c']['article_info']['class_id'] == _2_info['c']['class_info']['id'] and _2_info['c']['class_info']['has_chapter'] == 1:
                 for adict in _2_info['c']['chapter_list']:
-                    if article_info['chapter_id'] == adict['id']:
-                        article_info['chapter_name'] = adict['name']
-            article_info['article_learn_count'] = _4_info['c']['article_info']['cur_learn_count']
-            article_info['audio_url'] = _4_info['c']['article_info']['audio']['mp3_play_url']
-            article_info['create_time'] = content['data']['article']['CreateTime']
-            article_info['update_time'] = content['data']['article']['UpdateTime']
-            article_info['publish_time'] = content['data']['article']['PublishTime']
+                    if _4_info['c']['article_info']['chapter_id'] == adict['id']:
+
+                        ext_info['attribute_name'] = 'chapter_name'
+                        ext_info['attribute_value'] = adict['name']
+                        #插入额外信息表
+                        print('ext_info: ' + json.dumps(ext_info))
 
 
 
-            #正文解析
-            article_info['content'] = []
-            sub_content = json.loads(content['data']['content'])
-            for index,alist in enumerate(sub_content['content']):
-                temp_dict = {}
-                temp_dict['type'] = alist['type']
+            # article_info['create_time'] = content['data']['article']['CreateTime']
+            # article_info['update_time'] = content['data']['article']['UpdateTime']
+            # article_info['publish_time'] = content['data']['article']['PublishTime']
 
-                if temp_dict['type'] == 'audio':
-                    temp_dict['audio'] = {}
-                    temp_dict['aliasId'] = alist['audio']['aliasid']
+            #插入文章表
 
-                    if _4_info['c']['article_info']['audio']['alias_id'] == temp_dict['aliasId']:
-                        # 音频链接，这里src需要从另一个链接得到
-                        temp_dict['audio']['mp3_play_url'] = _4_info['c']['article_info']['audio']['mp3_play_url']
 
-                    # 音频标题
-                    temp_dict['audio']['title'] = alist['audio']['title']
-                    temp_dict['audio']['rawSize'] = alist['audio']['rawSize']
-                    temp_dict['audio']['duration'] = alist['audio']['duration']
-                    temp_dict['audio']['size'] = alist['audio']['size']
-                    temp_dict['tips'] = alist['tips']
-                elif temp_dict['type'] == 'image':
-                    # 去除版权页面,加强筛选，去除最后两个图片，最后两个图片一般是版权图片
-                    if len(alist['title']) > 0 or len(sub_content['content']) - index > 3:
-                        temp_dict['src'] = alist['src']
-                        temp_dict['title'] = alist['title']
 
-                elif temp_dict['type'] != 'center' and 'value' in alist:
-                    if temp_dict['type'] == 'comment':
-                        temp_dict['tag'] = alist['tag']
-                    temp_dict['value'] = alist['value']
 
-                article_info['content'].append(temp_dict)
-
-            print(json.dumps(article_info))
+            print('article_info: ' + json.dumps(article_info))
