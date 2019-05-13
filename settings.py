@@ -14,4 +14,6 @@ MYSQL_DATABASE = 'spider'
 TARGET_TABLE = 'tb_article'
 
 
+
+
 LOGGER_NAME = 'Shea'

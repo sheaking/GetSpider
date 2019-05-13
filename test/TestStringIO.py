@@ -19,3 +19,5 @@ js = json.loads(js)
 print(js)
 
 print('asdf'+'111')
+
+print('a' + str('asdf'))
