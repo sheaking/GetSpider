@@ -17,3 +17,7 @@ a = json.dumps([
 
 ])
 print(type(a))
+
+l = ['asdf','dfd','12sd']
+if 'asdf' not in l:
+    print('jaja')
