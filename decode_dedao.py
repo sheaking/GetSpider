@@ -4,7 +4,7 @@ import os
 import re
 from mitmproxy import ctx
 from id_util import generate_id
-from parse_content import get_content_list
+from parse_content import *
 from handle_mysql import MySQL
 
 def response(flow):
@@ -173,7 +173,8 @@ def response(flow):
                 # 正文是字符串，先进行loads
                 sub_content = json.loads(content['data']['content'])
                 # 正文解析,转换为字符串存储,并进行编码转换
-                article_info['article_content'] = json.dumps(get_content_list(sub_content, _4_info)).encode('gb2312').decode('unicode_escape')
+                temp = handle_dedao_dict(get_content_list(sub_content, _4_info))
+                article_info['article_content'] = temp
                 #插入文章表
                 mysql.insert('article', article_info)
 
