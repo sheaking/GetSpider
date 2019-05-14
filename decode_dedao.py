@@ -109,22 +109,24 @@ def response(flow):
         mysql = MySQL()
         mysql.get_connection()
 
-        if column_info:
-            print(json.dumps(column_info))
-            # 把category==40的栏目信息存储到数据库
-            mysql.insert('tb_column', column_info)
+        try:
 
-        if author_info:
-            print(json.dumps(author_info))
-            # 把作者信息存到数据库中
-            mysql.insert('author', author_info)
+            if column_info:
+                print(json.dumps(column_info))
+                # 把category==40的栏目信息存储到数据库
+                mysql.insert('tb_column', column_info)
 
-        if source_info:
-            print(json.dumps(source_info))
-            # 来源信息存入数据库
-            mysql.insert('source', source_info)
+            if author_info:
+                print(json.dumps(author_info))
+                # 把作者信息存到数据库中
+                mysql.insert('author', author_info)
 
-        mysql.close_connection()
+            if source_info:
+                print(json.dumps(source_info))
+                # 来源信息存入数据库
+                mysql.insert('source', source_info)
+        finally:
+            mysql.close_connection()
 
 
         with open('temp_file/2.txt', 'wb') as f:
@@ -156,12 +158,13 @@ def response(flow):
         with open('temp_file/4.txt', 'rb') as f:
             _4_info = pickle.load(f)
 
+        mysql = MySQL()
+        mysql.get_connection()
         try:
             if _4_info and _4_info['c']['dd_article_id'] == content['data']['article']['Id']:
                 #栏目信息嵌入
                 # article_info['column_id'] = generate_id(_4_info['c']['class_info']['name'])
                 # article_info['column_name'] = _4_info['c']['class_info']['name']
-
                 # article_info['class_id'] = _4_info['c']['article_info']['class_id']
 
                 # 文章id
@@ -169,11 +172,9 @@ def response(flow):
                 article_info['article_name'] = _4_info['c']['article_info']['title']
                 # 正文是字符串，先进行loads
                 sub_content = json.loads(content['data']['content'])
-                # 正文解析,转换为字符串存储
-                article_info['article_content'] = json.dumps(get_content_list(sub_content, _4_info))
+                # 正文解析,转换为字符串存储,并进行编码转换
+                article_info['article_content'] = json.dumps(get_content_list(sub_content, _4_info)).encode('gb2312').decode('unicode_escape')
                 #插入文章表
-                mysql = MySQL()
-                mysql.get_connection()
                 mysql.insert('article', article_info)
 
 
@@ -244,8 +245,6 @@ def response(flow):
                             print('ext_info: ' + json.dumps(ext_info))
                             mysql.insert('ext_attribute', ext_info)
 
-
-
                 # article_info['create_time'] = content['data']['article']['CreateTime']
                 # article_info['update_time'] = content['data']['article']['UpdateTime']
                 # article_info['publish_time'] = content['data']['article']['PublishTime']
@@ -256,3 +255,5 @@ def response(flow):
         except Exception as e:
             print('文章链接entree.igetget.com/ddarticle/v1/article/get 出现异常')
             print(e)
+        finally:
+            mysql.close_connection()
