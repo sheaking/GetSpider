@@ -42,9 +42,9 @@ def handle_dedao(driver):
         driver.find_element_by_xpath("//android.widget.TextView[@resource-id='com.luojilab.player:id/tv_sort_latest_purchase']").click()
 
 
-    # 点击已购买栏
+    # 点击去除×
     try:
-        if wait.until(lambda x: x.find_element_by_xpath("//android.widget.Button[@resource-id='com.luojilab.player:id/closeButton']")):
+        if WebDriverWait(driver, 3).until(lambda x: x.find_element_by_xpath("//android.widget.Button[@resource-id='com.luojilab.player:id/closeButton']")):
             driver.find_element_by_xpath("//android.widget.Button[@resource-id='com.luojilab.player:id/closeButton']").click()
     except:
         pass
@@ -69,72 +69,66 @@ def handle_dedao(driver):
             break
         time.sleep(0.5)
         count += 1
-
+        # 得到开始滚动的元素
         if wait.until(lambda x: x.find_element_by_xpath(
                 "//android.support.v7.widget.RecyclerView[@resource-id='com.luojilab.player:id/rv_content']/android.widget.RelativeLayout[3]")):
             origin_el = driver.find_element_by_xpath(
                 "//android.support.v7.widget.RecyclerView[@resource-id='com.luojilab.player:id/rv_content']/android.widget.RelativeLayout[3]")
-
+        # 得到滚动结束的元素
         if wait.until(lambda x: x.find_element_by_xpath(
                 "//android.support.v7.widget.RecyclerView[@resource-id='com.luojilab.player:id/rv_content']/android.widget.RelativeLayout[1]")):
             destination_el = driver.find_element_by_xpath(
                 "//android.support.v7.widget.RecyclerView[@resource-id='com.luojilab.player:id/rv_content']/android.widget.RelativeLayout[1]")
 
-        # 进行点击栏目处理
+        # 得到当前页面的栏目框架
         if wait.until(lambda x: x.find_element_by_xpath(
                 "//android.support.v7.widget.RecyclerView[@resource-id='com.luojilab.player:id/rv_content']")):
             frame_el = driver.find_element_by_xpath(
                 "//android.support.v7.widget.RecyclerView[@resource-id='com.luojilab.player:id/rv_content']")
-            print(type(frame_el))
 
+            token = 0
             for index,item in enumerate(frame_el.find_elements_by_class_name("android.widget.RelativeLayout")):
-                print(type(item))
+                # 如果为0,2,4，即外层的RelativeLayout
+                if index % 2 == 0:
+                    print("外层RelativeLayout")
+                    inner_layout = item.find_element_by_class_name("android.widget.RelativeLayout")
 
-                try:
-                    # 把最里面的RelativeLayout也访问到了
-                    # 最里面的就会抛出异常
-                    # 这里是外层的RelativeLayout，外层的可能没有ImageView
                     try:
-                        #如果有，就不break，没有就break出去
-                        item.find_element_by_class_name("android.widget.ImageView")
+                        if inner_layout.find_element_by_class_name("android.widget.TextView").get_attribute("text") == "电子书":
+                            token = 1
                     except:
-                        continue
+                        pass
 
-                    linear_layout = item.find_element_by_class_name("android.widget.LinearLayout")
-
-
-
-                    for i in linear_layout.find_elements_by_class_name("android.widget.TextView"):
-                        time.sleep(0.5)
-                        title_token = i.get_attribute('text')
-                        print(title_token)
-                        #如果token没有在列表中，就点击访问
-                        if title_token not in title_list:
-                            #dosth
-
-                            #添加标记
-                            title_list.append(title_token)
-                            print(title_list)
-                            item.click()
-                            time.sleep(2)
-                            driver.back()
-                        break
-
-                except:
-                    # 说明是里层的RelativeLayout
                     try:
-                        # 过滤电子书栏目,需要先访问里面的，再访问外面的RelativeLayout，这里暂时没法解决，就通过点进去看看能不能解决，把判断条件放到点击后的里面
-                        if item.find_element_by_class_name("android.widget.TextView").get_attribute("text") == '电子书':
-                            break
+                        #判断是否能找到，找不到抛异常
+                        item.find_element_by_class_name("android.widget.ImageView")
+
+                        if token == 0:
+                            # 如果到这里，说明即不是电子书，有。。。
+                            linear_layout = item.find_element_by_class_name("android.widget.LinearLayout")
+
+                            for i in linear_layout.find_elements_by_class_name("android.widget.TextView"):
+                                time.sleep(0.5)
+                                title_token = i.get_attribute('text')
+                                print(title_token)
+                                # 如果token没有在列表中，就点击访问
+                                if title_token not in title_list:
+                                    # dosth
+
+                                    # 添加标记
+                                    title_list.append(title_token)
+                                    print(title_list)
+                                    item.click()
+                                    time.sleep(2)
+                                    driver.back()
+                                break
+                        # 有...，但是是电子书
+                        else:
+                            token = 0
                     except:
                         pass
 
 
-
-
-            # for item in WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME,"android.widget.RelativeLayout"),)):
-            #     linear_layout = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME,"android.widget.RelativeLayout"),item))
-            #     for i in
 
         # driver.swipe(x1,y1,x1,y2,500)
         driver.scroll(origin_el,destination_el,500)

@@ -1,4 +1,4 @@
-
+import json
 
 def get_content_list(param,ext_info):
 
@@ -36,3 +36,19 @@ def get_content_list(param,ext_info):
         info_list.append(temp_dict)
 
     return info_list
+
+
+def handle_dedao_dict(target_list):
+    #先换value中的 "
+    for item in target_list:
+        temp = item.get('value')
+        if temp and temp.count('"'):
+            item['value'] = temp.replace('"','\'')
+
+    temp = json.dumps(target_list).encode('gb2312').decode('unicode_escape')
+    return temp.replace('\n','\\n ')
+
+
+
+
+

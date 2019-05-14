@@ -32,6 +32,7 @@ class MySQL():
         try:
             if self.db:
                 self.db.close()
+                print('关闭数据库链接成功')
                 return True
         except :
             self.logger.error('关闭数据库链接失败')
