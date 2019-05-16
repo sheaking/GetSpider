@@ -46,7 +46,7 @@ def handle_dedao_dict(target_list):
             item['value'] = temp.replace('"','\'')
 
     temp = json.dumps(target_list).encode('gb2312').decode('unicode_escape')
-    return temp.replace('\n','\\n ')
+    return temp.replace('\n','<br>')
 
 
 

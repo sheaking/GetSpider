@@ -236,7 +236,8 @@ def response(flow):
                 #得到文章 章节名
                 with open('temp_file/2.txt', 'rb') as f:
                     _2_info = pickle.load(f)
-                if generate_id(_4_info['c']['class_info']['name']) == _2_info['c']['class_info']['product_id']  and _4_info['c']['article_info']['class_id'] == _2_info['c']['class_info']['id'] and _2_info['c']['class_info']['has_chapter'] == 1:
+
+                if _4_info['c']['class_info']['name'] == _2_info['c']['class_info']['name']  and _4_info['c']['article_info']['class_id'] == _2_info['c']['class_info']['id'] and _2_info['c']['class_info']['has_chapter'] == 1:
                     for adict in _2_info['c']['chapter_list']:
                         if _4_info['c']['article_info']['chapter_id'] == adict['id']:
 
