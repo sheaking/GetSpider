@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import time
 #等待元素控件
 from selenium.webdriver.support.ui import WebDriverWait
