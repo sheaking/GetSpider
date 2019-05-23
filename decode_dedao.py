@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import json
 import pickle
 import os
@@ -6,19 +8,22 @@ from mitmproxy import ctx
 from id_util import generate_id
 from parse_content import *
 from handle_mysql import MySQL
+from urllib.parse import unquote
 
 def response(flow):
 
     #显示所有栏目列表发送的请求
     #这里要防止把之前的清空
-    if 'entree.igetget.com/purchased/v2/product/allList' in flow.request.url:
+    # if 'entree.igetget.com/purchased/v2/product/allList' in flow.request.url:
+    if 'igetget.com/purchased/v2/product/allList' in flow.request.url:
         #得到请求，看是否的第一次请求
         request = flow.request
         bys = request.content
-        s = bys.decode('utf-8')
+        s = '&' + bys.decode('utf-8') + '&'
         page_search = re.compile(r"&page=(.*?)&")
         page = re.search(page_search,s).groups(1)
 
+        print('第几次：', page[0])
         #如果是第一次请求。刷新1.txt文件
         if page[0] == '1':
             print('------------------')
@@ -64,7 +69,8 @@ def response(flow):
 
 
     #点击某个栏目后发送的请求1
-    if 'entree.igetget.com/bauhinia/v1/class/purchase/info' in flow.request.url:
+    # if 'entree.igetget.com/bauhinia/v1/class/purchase/info' in flow.request.url:
+    if 'igetget.com/bauhinia/v1/class/purchase/info' in flow.request.url:
         content = json.loads(flow.response.text)
 
         with open('temp_file/1.txt', 'rb') as f:
@@ -135,7 +141,7 @@ def response(flow):
 
     #点击栏目中的文章后发送的请求1
     #https://entree.igetget.com/bauhinia/v1/article/info
-    if 'entree.igetget.com/bauhinia/v1/article/info' in flow.request.url:
+    if 'igetget.com/bauhinia/v1/article/info' in flow.request.url:
         content = json.loads(flow.response.text)
 
         with open('temp_file/4.txt', 'wb') as f:
@@ -145,7 +151,7 @@ def response(flow):
     # 当我们请求的url包含以下字符串的时候就做对应的操作，对正文进行解析
     #有该文章标题，封面，正文，
     #还需要添加文章属于哪个栏目，属于该栏目的哪章
-    if 'entree.igetget.com/ddarticle/v1/article/get' in flow.request.url:
+    if 'igetget.com/ddarticle/v1/article/get' in flow.request.url:
         content = json.loads(flow.response.text)
 
         article_info = {}
