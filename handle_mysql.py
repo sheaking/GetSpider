@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from settings import *
 from my_logger import Logger
 import pymysql
@@ -130,7 +131,7 @@ class MySQL():
             self.cursor.execute(sql_query)
             print('查询出的数量：',self.cursor.rowcount)
             results = self.cursor.fetchall()
-            print(results)
+            # print(results)
             return results
         except:
             print('查询方法出现异常')
