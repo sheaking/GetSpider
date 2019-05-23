@@ -37,6 +37,10 @@ def get_content_list(param, ext_info):
             # 社会网络11里面的tip很大，异常的大
             if temp_dict['type'] == 'tip' and len(alist['value']) > 3500:
                 temp_dict['value'] = ''
+        # 增加过滤条件，版权归得到app所有，去除，其他的center可以添加
+        elif temp_dict['type'] == 'center' and '\u7248\u6743\u5f52\u5f97\u5230App\u6240\u6709' not in alist['value']:
+            temp_dict['value'] = alist['value']
+
 
         info_list.append(temp_dict)
 
