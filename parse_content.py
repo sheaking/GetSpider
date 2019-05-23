@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 import json
 
-def get_content_list(param,ext_info):
+def get_content_list(param, ext_info):
 
     info_list = []
 
@@ -31,7 +32,11 @@ def get_content_list(param,ext_info):
         elif temp_dict['type'] != 'center' and 'value' in alist:
             if temp_dict['type'] == 'comment':
                 temp_dict['tag'] = alist['tag']
+
             temp_dict['value'] = alist['value']
+            # 社会网络11里面的tip很大，异常的大
+            if temp_dict['type'] == 'tip' and len(alist['value']) > 3500:
+                temp_dict['value'] = ''
 
         info_list.append(temp_dict)
 
@@ -46,7 +51,10 @@ def handle_dedao_dict(target_list):
             item['value'] = temp.replace('"','\'')
 
     temp = json.dumps(target_list).encode('gb2312').decode('unicode_escape')
-    return temp.replace('\n','<br>')
+    # 将神秘符号进行替换
+    temp = temp.replace('	', ' ')
+    temp = temp.replace('\n', '<br>')
+    return temp
 
 
 
