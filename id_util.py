@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 def generate_id(key):
     id = 0
     for index, s in enumerate(key):
