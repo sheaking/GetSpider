@@ -73,22 +73,19 @@ def down_dedao():
                     # 下载音频
                     # if '.m4a' in resource or '.mp4' in resource:
                     audio_parse = urlparse(resource)
-                    audio_headers['Host'] = audio_parse[1]
-                    # if 'igetoss-ws' in audio_parse[1]:
-                    #     audio_headers['Host'] = audio_parse[1]
-                    #     if audio_headers.get(':authority'):
-                    #         audio_headers.pop(':authority')
-                    # else:
-                    #     audio_headers[':authority'] = audio_parse[1]
-                    #     if audio_headers.get('Host'):
-                    #         audio_headers.pop('Host')
-                    audio = requests.get(resource, headers=audio_headers)
+                    if '.m4a' in resource or '.mp4' in resource:
+                        audio_headers['Host'] = audio_parse[1]
+                        audio = requests.get(resource, headers=audio_headers)
+                    else:
+                        image_headers['Host'] = audio_parse[1]
+                        audio = requests.get(resource, headers=image_headers)
+
+                    # 解析出资源名
                     audio_name = audio_parse[2][audio_parse[2].rfind('/') + 1:]
                     # 把文章资源放到resource/id/...
                     with open(os.path.join(os.path.abspath('resource'), str(id), audio_name), 'wb') as f:
                         f.write(audio.content)
                         file_path_list.append(os.path.join(os.path.abspath('resource'), audio_name))
-                        # resource_path_list.append(os.path.join(os.path.abspath('resource'), audio_name))
                     print('资源下载成功：%s' % os.path.join(os.path.abspath('resource'), audio_name))
                     time.sleep(3)
 
