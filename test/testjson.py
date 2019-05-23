@@ -10,6 +10,16 @@ temp['value'] = temp['value'].replace('"','\"')
 print(temp['value'])
 print(json.dumps(temp))
 
+s2 = '''{"type":"title","value":"1.	词汇量：学龄前1000个听力词汇的积累"}'''
+
+print(s2.find('	'))
+
+print(s2)
+print(json.loads(s2.replace('	',' ')))
+
+
+s3 = '''{"type": "elite", "value": "1）	组织行为学以组织目标为导向；<br>2）	组织行为学的研究方法是实证研究，这也导致它和管理学是两个学派，它们的根本区别在于是否认同真理的不变性；<br>3）	组织行为学的基本观点是权变。"}'''
+print(s3.find('	'))
 # print(s.count('\n'))
 # print('\n' in s)
 # print(s.find('\n'))
