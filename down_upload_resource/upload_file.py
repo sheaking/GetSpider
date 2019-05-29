@@ -60,7 +60,6 @@ def upload_file(path,current_count = 1,max_retry_count = 3):
         print('文件 %s 上传次数超过 %s ,上传失败！' % (path, max_retry_count))
         # 上传3次都没有上传成功就抛出异常
         raise Exception('文件 %s 上传次数超过 %s ,上传失败！' % (path, max_retry_count))
-        return None
 
 if __name__ == '__main__':
     mysql = MySQL()
@@ -77,15 +76,15 @@ if __name__ == '__main__':
                     file_path = os.path.join(dir_path, file)
                     # 上传,如果上传失败就重复试3次
                     upload_file(file_path)
-                    time.sleep(2)
+                    # time.sleep(1)
                 # 该文章upload字段更新,更新为已上传成功
-                mysql.update('article', 'uploaded = 1', 'article_id = %s' % dir)
+                mysql.update('article', 'avatar_uploaded = 1', 'article_id = %s' % dir)
             except Exception as e:
                 print(e)
                 # 这里写到日志里面
                 print('文章 %s 上传失败！' % dir)
         # 清空文件夹
-        clear_dir(os.path.abspath('resource'))
+        # clear_dir(os.path.abspath('resource'))
     finally:
         mysql.close_connection()
 

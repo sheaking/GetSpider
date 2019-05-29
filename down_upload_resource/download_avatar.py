@@ -37,7 +37,7 @@ def down_dedao():
     try:
         mysql.get_connection()
 
-        select_results = mysql.select('article',['article_id','article_content'],'uploaded = 0')
+        select_results = mysql.select('article',['article_id','article_content'],'avatar_uploaded = 0')
 
         print(len(select_results))
         problem_list = []
@@ -45,7 +45,6 @@ def down_dedao():
         # type:"image , src:"
         for result in select_results:
             resource_list = []
-            file_path_list = []
             # 文章id
             id = result[0]
 
@@ -59,9 +58,6 @@ def down_dedao():
             # 查封面
             ext_attributes = mysql.select('ext_attribute',['article_id','attribute_name','attribute_value'],'article_id = ' + str(id))
             for ext_attribute in ext_attributes:
-                # 封面追加
-                if ext_attribute[1] == 'cover_image':
-                    resource_list.append(ext_attribute[2])
                 # 评论头像追加
                 if ext_attribute[1] == 'comment':
                     comment = json.loads(ext_attribute[2])
@@ -71,14 +67,6 @@ def down_dedao():
 
             # 文章正文
             try:
-                contents = json.loads(result[1])
-
-                for content in contents:
-                    if content['type'] == 'audio':
-                        resource_list.append(content['audio']['mp3_play_url'])
-                    elif content['type'] == 'image':
-                        if content.get('src'):
-                            resource_list.append(content.get('src'))
 
                 # 先创建目录
                 os.mkdir(os.path.join(os.path.abspath('resource'), str(id)))
@@ -100,7 +88,6 @@ def down_dedao():
                     # 把文章资源放到resource/id/...
                     with open(os.path.join(os.path.abspath('resource'), str(id), audio_name), 'wb') as f:
                         f.write(audio.content)
-                        file_path_list.append(os.path.join(os.path.abspath('resource'), audio_name))
                     print('资源下载成功：%s' % os.path.join(os.path.abspath('resource'), audio_name))
                     time.sleep(2)
 
