@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# 生成得到app的id规则
 def generate_id(key):
     id = 0
     for index, s in enumerate(key):

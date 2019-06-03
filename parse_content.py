@@ -2,6 +2,12 @@
 import json
 
 def get_content_list(param, ext_info):
+    '''
+
+    :param param:
+    :param ext_info:
+    :return:
+    '''
 
     info_list = []
 

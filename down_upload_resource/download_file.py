@@ -12,9 +12,27 @@ import pickle
 
 '下载资源'
 
-proxies={
-    'https':'https://112.87.71.153:9999'
+# 代理服务器
+proxyHost = "http-cla.abuyun.com"
+proxyPort = "9030"
+
+# 代理隧道验证信息
+proxyUser = "H03929F8816459LC"
+proxyPass = "4B500FA51D06F5FD"
+
+proxyMeta = "http://%(user)s:%(pass)s@%(host)s:%(port)s" % {
+    "host" : proxyHost,
+    "port" : proxyPort,
+    "user" : proxyUser,
+    "pass" : proxyPass,
 }
+proxies = {
+    "http"  : proxyMeta,
+    "https" : proxyMeta,
+}
+
+
+
 audio_headers = {
     'Accept': 'application/json,application/xml,application/xhtml+xml,text/html;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate',
@@ -31,6 +49,8 @@ image_headers = {
 
 }
 def down_dedao():
+    print(image_headers)
+    print(proxies)
     global problem_list
     mysql = MySQL()
 
@@ -90,9 +110,11 @@ def down_dedao():
                     audio_parse = urlparse(resource)
                     if '.m4a' in resource or '.mp4' in resource:
                         audio_headers['Host'] = audio_parse[1]
+                        # audio = requests.get(resource, headers=audio_headers, proxies=proxies)
                         audio = requests.get(resource, headers=audio_headers)
                     else:
                         image_headers['Host'] = audio_parse[1]
+                        # audio = requests.get(resource, headers=image_headers, proxies=proxies)
                         audio = requests.get(resource, headers=image_headers)
 
                     # 解析出资源名
@@ -102,7 +124,7 @@ def down_dedao():
                         f.write(audio.content)
                         file_path_list.append(os.path.join(os.path.abspath('resource'), audio_name))
                     print('资源下载成功：%s' % os.path.join(os.path.abspath('resource'), audio_name))
-                    time.sleep(2)
+                    time.sleep(1)
 
             except:
                 problem_list.append(id)

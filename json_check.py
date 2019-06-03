@@ -2,6 +2,8 @@
 from handle_mysql import MySQL
 import json
 
+
+# 检测文章中是否有不合法的json
 mysql = MySQL()
 try:
     mysql.get_connection()
