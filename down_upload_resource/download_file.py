@@ -48,7 +48,7 @@ image_headers = {
     'User-Agent':'okhttp/3.11.0'
 
 }
-def down_dedao():
+def down_dedao(num):
     print(image_headers)
     print(proxies)
     global problem_list
@@ -57,7 +57,7 @@ def down_dedao():
     try:
         mysql.get_connection()
 
-        select_results = mysql.select('article',['article_id','article_content'],'uploaded = 0')
+        select_results = mysql.select('article',['article_id','article_content'],'uploaded = 0 limit %s' % num)
 
         print(len(select_results))
         problem_list = []

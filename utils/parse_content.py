@@ -57,7 +57,8 @@ def handle_dedao_dict(target_list):
     #先换value中的 "
     for item in target_list:
         temp = item.get('value')
-        if temp and temp.count('"'):
+        # print('temp type:', type(temp))
+        if temp and not isinstance(temp,dict) and temp.count('"'):
             item['value'] = temp.replace('"','\'')
 
     temp = json.dumps(target_list).encode('gb2312').decode('unicode_escape')
@@ -65,8 +66,3 @@ def handle_dedao_dict(target_list):
     temp = temp.replace('	', ' ')
     temp = temp.replace('\n', '<br>')
     return temp
-
-
-
-
-

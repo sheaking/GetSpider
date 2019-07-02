@@ -31,7 +31,7 @@ headers = {
 "Accept-Encoding":"gzip",
 "User-Agent":"okhttp/3.11.0",
 }
-print(str(int(time.time())))
+# print(str(int(time.time())))
 
 data = {
 	"ptype": 22,
@@ -60,6 +60,8 @@ data = {
 }
 
 url = 'https://entree.igetget.com/bauhinia/v1/class/purchase/info'
+url2 = 'https://entree.igetget.com/onepiece/v1/user/init?phone=17521359419'
 
-r = requests.post(url=url, headers=headers, json=data)
-print(r.json())
+r = requests.get(url='https://www.baidu.com', headers=headers)
+# print(r.json())
+print(r.text)

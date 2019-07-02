@@ -5,7 +5,7 @@ import os
 import re
 from utils.id_util import generate_id
 from utils.parse_content import *
-from handle_mysql import MySQL
+from handle_mysql2 import MySQL
 
 
 def response(flow):
@@ -118,17 +118,13 @@ def response(flow):
             if column_info:
                 print(json.dumps(column_info))
                 # 把category==40的栏目信息存储到数据库
-                mysql.insert('tb_column', column_info)
+                mysql.insert('column_', column_info)
 
             if author_info:
                 print(json.dumps(author_info))
                 # 把作者信息存到数据库中
                 mysql.insert('author', author_info)
 
-            if source_info:
-                print(json.dumps(source_info))
-                # 来源信息存入数据库
-                mysql.insert('source', source_info)
         finally:
             mysql.close_connection()
 
@@ -208,7 +204,7 @@ def response(flow):
                 article_source_info['article_id'] = article_info['article_id']
                 article_source_info['source_id'] = generate_id('https://www.igetget.com/')
                 print('article_source_info: ' + json.dumps(article_source_info))
-                mysql.insert('article_source', article_source_info)
+                # mysql.insert('article_source', article_source_info)
 
 
                 #额外信息
@@ -217,31 +213,31 @@ def response(flow):
                 ext_info['attribute_value'] = _4_info['c']['prev_article_id']
                 #插入额外属性表
                 print('ext_info: ' + json.dumps(ext_info))
-                mysql.insert('ext_attribute',ext_info)
+                # mysql.insert('ext_attribute',ext_info)
 
                 ext_info['attribute_name'] = 'next_article_id'
                 ext_info['attribute_value'] = _4_info['c']['next_article_id']
                 #插入额外属性表
                 print('ext_info: ' + json.dumps(ext_info))
-                mysql.insert('ext_attribute', ext_info)
+                # mysql.insert('ext_attribute', ext_info)
 
                 ext_info['attribute_name'] = 'cover_image'
                 ext_info['attribute_value'] = _4_info['c']['article_info']['logo']
                 # 插入额外属性表
                 print('ext_info: ' + json.dumps(ext_info))
-                mysql.insert('ext_attribute', ext_info)
+                # mysql.insert('ext_attribute', ext_info)
 
                 ext_info['attribute_name'] = 'article_learn_count'
                 ext_info['attribute_value'] = _4_info['c']['article_info']['cur_learn_count']
                 # 插入额外属性表
                 print('ext_info: ' + json.dumps(ext_info))
-                mysql.insert('ext_attribute', ext_info)
+                # mysql.insert('ext_attribute', ext_info)
 
                 ext_info['attribute_name'] = 'audio_url'
                 ext_info['attribute_value'] = _4_info['c']['article_info']['audio']['mp3_play_url']
                 # 插入额外属性表
                 print('ext_info: ' + json.dumps(ext_info))
-                mysql.insert('ext_attribute', ext_info)
+                # mysql.insert('ext_attribute', ext_info)
 
                 # article_info['article_learn_count'] = _4_info['c']['article_info']['cur_learn_count']
                 # article_info['audio_url'] = _4_info['c']['article_info']['audio']['mp3_play_url']
@@ -258,7 +254,7 @@ def response(flow):
                             ext_info['attribute_value'] = adict['name']
                             #插入额外信息表
                             print('ext_info: ' + json.dumps(ext_info))
-                            mysql.insert('ext_attribute', ext_info)
+                            # mysql.insert('ext_attribute', ext_info)
 
                 # article_info['create_time'] = content['data']['article']['CreateTime']
                 # article_info['update_time'] = content['data']['article']['UpdateTime']
@@ -399,7 +395,7 @@ def response(flow):
                 mysql = MySQL()
                 mysql.get_connection()
                 # 目前判重机制是看这个article_id是否有额外属性comment，如果有就判重，但是没有比较内容是否重复，只是判断是否有这个属性
-                mysql.insert('ext_attribute',ext_info)
+                # mysql.insert('ext_attribute',ext_info)
 
             finally:
                 mysql.close_connection()
