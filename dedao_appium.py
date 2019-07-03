@@ -64,15 +64,13 @@ def handle_dedao(driver):
     no_crawl_columns += list(map(f, db_crawled_finished_columns))
     print('完整的no_crawl_columns：', no_crawl_columns)
 
-
-
     # 点击全部列表
     if wait.until(lambda x: x.find_element_by_xpath("//android.widget.TextView[@text='全部 133']")):
         driver.find_element_by_xpath("//android.widget.TextView[@text='全部 133']").click()
 
-
+    #开始大循环栏目列表
     while True:
-        # 循环当前页面的栏目列表
+        # 循环当前页面的栏目列表，并把点击后的栏目列表放到no_crawl_columns中
         crawl_columns_list(driver, no_crawl_columns)
         # print(db_crawled_finished_columns)
 
@@ -93,8 +91,6 @@ def handle_dedao(driver):
         if temp == driver.page_source:
             break
 
-
-
 def crawl_columns_list(driver, no_crawl_columns):
     '''
     循环点击当前页面的所有栏目
@@ -113,37 +109,117 @@ def crawl_columns_list(driver, no_crawl_columns):
                     column.find_element_by_id("com.luojilab.player:id/column_name").click()
                     time.sleep(2)
 
-                    # 如果出现完成奖章页面
-                    if '如此优秀的你学完了' in driver.page_source:
-                        driver.back()
-
-                    crawl_column(driver, crawled_article, 0)
+                    # 爬取此栏目所有文章
+                    crawl_column(driver, column_name)
                     driver.back()
                     no_crawl_columns.append(column_name)
                     crawl_columns_list(driver, no_crawl_columns)
             except:
                 pass
 
-def crawl_column(driver, crawled_article, token = 0):
-    if token == 0:
-        # 向上滑动，去到最顶端
-        if wait.until(lambda x: x.find_element_by_id("com.luojilab.player:id/tv_sort")):
-            sort_btn = driver.find_element_by_id("com.luojilab.player:id/tv_sort")
-            sort_btn.click()
-            time.sleep(3)
-            sort_btn.click()
-            time.sleep(1)
-            # 向上滑动窗口
-            l = get_size(driver)
-            x1 = int(l[0] * 0.5)
-            y1 = int(l[1] * 0.9)
-            y2 = int(l[1] * 0.5)
-            n = 0
-            while n < 10:
-                driver.swipe(x1, y2, x1, y1)
-                time.sleep(0.3)
-                n += 1
+def crawl_column(driver, column_name):
+    '''
+    爬取栏目所有文章
+    进去可能会出现奖章页面
+    进去第一篇文章可能不在顶部
+    :param driver:
+    :param column_name:
+    :return:
+    '''
 
+    # 从数据库中获取这个栏目已经爬取的文章的标题
+
+    # if os.path.exists('token.txt'):
+    #     with open('token.txt','rb') as f:
+    #         crawled_article = pickle.load(f)
+    # else:
+    #     crawled_article = []
+    # print(crawled_article)
+
+
+    # 如果出现完成奖章页面
+    if '如此优秀的你学完了' in driver.page_source:
+        driver.back()
+
+    print('正在爬取栏目：', column_name)
+    # 从数据库中取出该栏目爬取完毕的文章，去重
+    column = mysql.select('tb_column', ['column_id', 'current_article_num'], 'column_name="%s"' % column_name)
+    # print(result)
+    # 这篇栏目爬取的文章的名称
+    crawled_articles = []
+    flag = False
+
+    # 如果数据库中有此栏目
+    if column:
+        column_id = column[0][0]
+        current_article_num = column[0][1]
+        print(column_id, column_name, current_article_num)
+
+        def f(x):
+            return x[0]
+
+        crawled_article_id = mysql.select('article_column', ['article_id'], 'column_id="%s"' % column_id)
+        crawled_article_ids = list(map(f, crawled_article_id))
+        print(crawled_article_ids)
+        print(len(crawled_article_ids), current_article_num)
+        # 如果栏目没有被爬取完毕
+        if len(crawled_article_ids) < current_article_num:
+            for article_id in crawled_article_ids:
+                article_name = mysql.select('article', ['article_name'], 'article_id="%s"' % article_id)
+                if article_name:
+                    article_name = article_name[0][0]
+                    crawled_articles.append(article_name)
+                    print(article_name)
+        # 如果文章爬取完毕，就返回
+        else:
+            flag = True
+
+    if flag:
+        return
+    print('当前栏目已经爬取文章名：', crawled_articles)
+
+    # 向上滑动，去到最顶端
+    if wait.until(lambda x: x.find_element_by_id("com.luojilab.player:id/tv_sort")):
+        sort_btn = driver.find_element_by_id("com.luojilab.player:id/tv_sort")
+        sort_btn.click()
+        time.sleep(3)
+        sort_btn.click()
+        time.sleep(1)
+        # 向上滑动窗口
+        l = get_size(driver)
+        x1 = int(l[0] * 0.5)
+        y1 = int(l[1] * 0.9)
+        y2 = int(l[1] * 0.5)
+        n = 0
+        while n < 10:
+            driver.swipe(x1, y2, x1, y1)
+            time.sleep(0.3)
+            n += 1
+
+    # 爬取每一篇文章
+    while True:
+
+        crawl_articles(driver, crawled_articles)
+        temp = driver.page_source
+
+        # 拖动
+        if wait.until(lambda x: x.find_element_by_class_name("android.support.v7.widget.RecyclerView")):
+            # if wait.until(lambda x: x.find_element_by_id("com.luojilab.player:id/rv_flat_list")):
+            rv_flat_list = driver.find_element_by_class_name("android.support.v7.widget.RecyclerView")
+            # rv_flat_list = driver.find_element_by_id("com.luojilab.player:id/rv_flat_list")
+            articles = rv_flat_list.find_elements_by_class_name("android.widget.LinearLayout")
+
+            origin_el = articles[1]
+            destination_el = articles[len(articles) - 2]
+            driver.drag_and_drop(destination_el, origin_el)
+
+        if temp == driver.page_source:
+            # with open('token.txt', 'wb') as f:
+            #     pickle.dump(crawled_article, f)
+            break
+
+
+def crawl_articles(driver, crawled_articles):
     # if wait.until(lambda x: x.find_element_by_id("com.luojilab.player:id/rv_flat_list")):
     if wait.until(lambda x: x.find_element_by_class_name("android.support.v7.widget.RecyclerView")):
         # rv_flat_list = driver.find_element_by_id("com.luojilab.player:id/rv_flat_list")
@@ -152,19 +228,19 @@ def crawl_column(driver, crawled_article, token = 0):
         for article in articles:
             try:
                 title = article.find_element_by_id("com.luojilab.player:id/tv_title").get_attribute("text")
-                if title not in crawled_article:
+                if title not in crawled_articles:
                     # 点击进去爬取
                     article.click()
                     time.sleep(3)
                     # 进行文章爬取
-                    crawl_article(driver)
-                    # time.sleep(3)
 
+                    # crawl_article(driver)
                     driver.back()
-                    crawled_article.append(title)
-                    with open('token.txt', 'wb') as f:
-                        pickle.dump(crawled_article, f)
-                    crawl_column(driver, crawled_article, token + 1)
+
+                    crawled_articles.append(title)
+                    # with open('token.txt', 'wb') as f:
+                    #     pickle.dump(crawled_article, f)
+                    crawl_articles(driver, crawled_articles)
             except:
                 pass
 
@@ -180,6 +256,7 @@ def crawl_article(driver):
         if temp == driver.page_source and '点击加载留言' in driver.page_source:
             break
     # db_crawled_unfinished_columns = mysql.select('tb_column', ['column_name'], 'crawl_finished = 0')
+
 
 def get_no_crawl_columns(driver, no_crawl_columns, target):
     if wait.until(lambda x: x.find_element_by_xpath("//android.view.ViewGroup")):
@@ -223,17 +300,7 @@ def reset_columns(driver):
     if wait.until(lambda x: x.find_element_by_id("com.luojilab.player:id/nearBuyBtn")):
         driver.find_element_by_id("com.luojilab.player:id/nearBuyBtn").click()
 
-
-
 if __name__ == '__main__':
-
-    # 做爬取记录，爬取过的文章不再爬取
-    if os.path.exists('token.txt'):
-        with open('token.txt','rb') as f:
-            crawled_article = pickle.load(f)
-    else:
-        crawled_article = []
-    print(crawled_article)
 
     mysql = MySQL()
     try:
