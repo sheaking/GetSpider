@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from settings2 import *
+from config.settings2 import *
 from my_logger import Logger
 import pymysql
 
@@ -65,7 +65,7 @@ class MySQL():
         try:
              #判断要插入的数据是否在数据库中存在，按照不同表的唯一标识进行查询
 
-            if table == 'column_':
+            if table == 'tb_column':
                 sql_filter = 'column_id = \"' + str(data.get('column_id')) + '\"'
 
 
