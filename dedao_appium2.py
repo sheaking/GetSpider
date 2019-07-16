@@ -11,6 +11,8 @@ desired_caps = {
   "platformName": "Android",
   "platformVersion": "7.1.2",
   "deviceName": "127.0.0.1:62028",
+  # "platformVersion": "7.0",
+  # "deviceName": "59428cdc",
   "appPackage": "com.luojilab.player",
   "appActivity": "com.luojilab.business.welcome.SplashActivity",
   "noReset": True,
@@ -27,7 +29,7 @@ wait = WebDriverWait(driver, 10)
 def get_size(driver):
     x = driver.get_window_size()['width']
     y = driver.get_window_size()['height']
-    return (x,y)
+    return (x, y)
 
 def handle_dedao(driver):
     try:
@@ -43,7 +45,6 @@ def handle_dedao(driver):
 
     if wait.until(lambda x: x.find_element_by_xpath("//android.support.v7.widget.RecyclerView[@resource-id='com.luojilab.player:id/rv_content']/android.widget.RelativeLayout[1]")):
         driver.find_element_by_xpath("//android.support.v7.widget.RecyclerView[@resource-id='com.luojilab.player:id/rv_content']/android.widget.RelativeLayout[1]").click()
-
 
     # 做爬取记录，爬取过的文章不再爬取
     if os.path.exists('token.txt'):
@@ -90,11 +91,12 @@ def crawl_column(driver, crawled_article):
                 title = article.find_element_by_id("com.luojilab.player:id/tv_title").get_attribute("text")
                 if title not in crawled_article:
                     # 点击进去爬取
-                    article.click()
+                    article.find_element_by_id("com.luojilab.player:id/tv_title").click()
 
+                    time.sleep(3)
                     # 进行文章爬取
                     crawl_article(driver)
-                    # time.sleep(3)
+
 
                     driver.back()
                     crawled_article.append(title)
@@ -109,12 +111,19 @@ def crawl_article(driver):
     x1 = int(l[0] * 0.5)
     y1 = int(l[1] * 0.75)
     y2 = int(l[1] * 0.25)
+
+    n = 0
     while True:
         temp = driver.page_source
         driver.swipe(x1, y1, x1, y2)
         time.sleep(0.2)
+        # if temp == driver.page_source and '点击加载留言' in driver.page_source:
         if temp == driver.page_source:
-            break
+            if n > 3:
+                break
+            n += 1
+
+
 
 
 

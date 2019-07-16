@@ -66,7 +66,7 @@ def response(flow):
                     pickle.dump(_1_info_before, f)
 
 
-    #点击某个栏目后发送的请求1
+    # 点击某个栏目后发送的请求1
     # if 'entree.igetget.com/bauhinia/v1/class/purchase/info' in flow.request.url:
     if 'igetget.com/bauhinia/v1/class/purchase/info' in flow.request.url:
         content = json.loads(flow.response.text)
@@ -83,6 +83,16 @@ def response(flow):
             #尽量多用content里的变量
             #column的id竟然不是唯一的，用类型进一步限制下，不然会把其他栏目的信息，放到错位的栏目上
             #用column_id和content_category先唯一限定column试试
+            print('-----------'* 10)
+            print(alist['id'])
+            print(content['c']['class_info']['product_id'])
+            print(alist['category'])
+            print(alist['type'])
+            print(content['c']['class_info']['product_type'])
+            print(content['c']['class_info']['name'])
+            print(alist['title'])
+            print('-----------' * 10)
+
             if alist['id'] == content['c']['class_info']['product_id'] and alist['category'] == 40 and alist['type'] == content['c']['class_info']['product_type'] and content['c']['class_info']['name'] == alist['title']:
                 #栏目
                 #根据栏目名称生成栏目id
@@ -109,9 +119,9 @@ def response(flow):
 
                 break
 
-
         mysql = MySQL()
         mysql.get_connection()
+
 
         try:
 
@@ -129,6 +139,8 @@ def response(flow):
                 print(json.dumps(source_info))
                 # 来源信息存入数据库
                 mysql.insert('source', source_info)
+        except Exception as e:
+            print(e)
         finally:
             mysql.close_connection()
 
@@ -312,7 +324,8 @@ def response(flow):
             page_count_search = re.compile(r"&page_count=(.*?)&")
             page_count = re.search(page_count_search, s).groups(1)
 
-            article_id_search = re.compile(r"&article_id=(.*?)&")
+            article_id_search = re.compile(r"&detail_id=(.*?)&")
+            # article_id_search = re.compile(r"&article_id=(.*?)&")
             article_id = re.search(article_id_search, s).groups(1)
 
             print(page[0],page_count[0],article_id[0])
@@ -385,8 +398,8 @@ def response(flow):
                 comment['list'] = []
 
             # 如果大于18，就取前18个
-            if len(comment['list']) > 30:
-                comment['list'] = comment['list'][:30]
+            if len(comment['list']) > 50:
+                comment['list'] = comment['list'][:50]
 
             ext_info['attribute_value'] = json.dumps(comment,ensure_ascii=False)
 
@@ -395,8 +408,8 @@ def response(flow):
             # print(len(json.dumps(comment).encode('gb2312').decode('unicode_escape')))
             # print('哈哈')
             # 插入数据库
+            mysql = MySQL()
             try:
-                mysql = MySQL()
                 mysql.get_connection()
                 # 目前判重机制是看这个article_id是否有额外属性comment，如果有就判重，但是没有比较内容是否重复，只是判断是否有这个属性
                 mysql.insert('ext_attribute',ext_info)

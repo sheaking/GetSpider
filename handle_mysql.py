@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from settings import *
+from config.settings import *
 from my_logger import Logger
 import pymysql
 
@@ -59,15 +59,13 @@ class MySQL():
         keys = ', '.join(data.keys())
         values = ', '.join(['%s'] * len(data))
 
-
         sql_query = 'insert into %s (%s) values (%s)' % (table, keys, values)
         # print(self.select(table, 'count(url)', 'url = \"' + data.get('url') + '\"'))
         try:
              #判断要插入的数据是否在数据库中存在，按照不同表的唯一标识进行查询
-
+            sql_filter = ''
             if table == 'tb_column':
                 sql_filter = 'column_id = \"' + str(data.get('column_id')) + '\"'
-
 
             elif table == 'category':
                 sql_filter = 'category_id = \"' + str(data.get('category_id')) + '\"'
@@ -80,8 +78,6 @@ class MySQL():
 
             elif table == 'ext_attribute':
                 sql_filter = 'article_id = \"' + str(data.get('article_id')) + '\"' + ' and ' + 'attribute_name=\"' + str(data.get('attribute_name')) + '\"'
-
-
 
             elif table == 'article':
                 sql_filter = 'article_id = \"' + str(data.get('article_id')) + '\"'
@@ -98,16 +94,14 @@ class MySQL():
             elif table == 'article_source':
                 sql_filter = 'article_id = \"' + str(data.get('article_id')) + '\"'
 
-
-
-
-            if self.select(table,'count(1)', sql_filter) == ((0,),):
-                if self.cursor.execute(sql_query, tuple(data.values())):
-                    # print(self.select(table,'count(url)', 'url = \"' + data.get('url') + '\"'))
-                    print(table + '：数据插入成功')
-                    self.db.commit()
-            else:
-                print(table + '： 数据库中该数据已经存在，插入失败')
+            if sql_filter:
+                if self.select(table,'count(1)', sql_filter) == ((0,),):
+                    if self.cursor.execute(sql_query, tuple(data.values())):
+                        # print(self.select(table,'count(url)', 'url = \"' + data.get('url') + '\"'))
+                        print(table + '：数据插入成功')
+                        self.db.commit()
+                else:
+                    print(table + '： 数据库中该数据已经存在，插入失败')
 
         except Exception as e:
 
@@ -115,8 +109,6 @@ class MySQL():
             print(e)
             self.logger.error('插入方法出现异常，数据插入失败')
             self.db.rollback()
-
-
 
     def select(self, table, columns, filter):
 

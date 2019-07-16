@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from handle_mysql import MySQL
 import json
+import time
 
 def check_num(column_id):
     '''
@@ -13,6 +14,8 @@ def check_num(column_id):
         mysql.get_connection()
         ids = mysql.select('article_column', ['article_id'], 'column_id=%s' % column_id)
         print(ids)
+        print(len(ids))
+        time.sleep(3)
 
         def f(x):
             return x[0]
@@ -26,6 +29,8 @@ def check_num(column_id):
                 first_id = id
                 break
 
+        print(first_id)
+        time.sleep(3)
         token = True
         for i in range(400):
             # 查找当前id的下一篇id
@@ -70,4 +75,4 @@ if __name__ == '__main__':
     # 第一季
     # check_num('634923')
     # 第二季
-    check_num('635063')
+    check_num('222826')

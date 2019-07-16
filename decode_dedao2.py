@@ -118,7 +118,7 @@ def response(flow):
             if column_info:
                 print(json.dumps(column_info))
                 # 把category==40的栏目信息存储到数据库
-                mysql.insert('column_', column_info)
+                mysql.insert('tb_column', column_info)
 
             if author_info:
                 print(json.dumps(author_info))
@@ -391,8 +391,8 @@ def response(flow):
             # print(len(json.dumps(comment).encode('gb2312').decode('unicode_escape')))
             # print('哈哈')
             # 插入数据库
+            mysql = MySQL()
             try:
-                mysql = MySQL()
                 mysql.get_connection()
                 # 目前判重机制是看这个article_id是否有额外属性comment，如果有就判重，但是没有比较内容是否重复，只是判断是否有这个属性
                 # mysql.insert('ext_attribute',ext_info)

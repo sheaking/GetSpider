@@ -7,7 +7,7 @@ from handle_mysql import MySQL
 import time
 
 # 目前一下子下载20条数据，到resource文件夹中
-down_dedao(12)
+down_dedao(534252, 60)
 
 # 进行上传
 mysql = MySQL()
