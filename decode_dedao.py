@@ -20,7 +20,7 @@ class Counter():
         self.num = 0
 
     def handle_yaml(self):
-
+        pass
 
 
     def response(self, flow: mitmproxy.http.HTTPFlow):
