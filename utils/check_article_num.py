@@ -75,4 +75,4 @@ if __name__ == '__main__':
     # 第一季
     # check_num('634923')
     # 第二季
-    check_num('222826')
+    check_num('443890')

@@ -7,7 +7,7 @@ from handle_mysql import MySQL
 import time
 
 # 目前一下子下载20条数据，到resource文件夹中
-down_dedao(534252, 60)
+down_dedao(443890, 80)
 
 # 进行上传
 mysql = MySQL()
@@ -32,7 +32,7 @@ try:
             # 这里写到日志里面
             print('文章 %s 上传失败！' % dir)
     # 清空文件夹
-    # clear_dir(os.path.abspath('resource'))
+    clear_dir(os.path.abspath('resource'))
 finally:
     mysql.close_connection()
 

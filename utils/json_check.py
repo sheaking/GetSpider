@@ -3,7 +3,9 @@ from handle_mysql import MySQL
 import json
 
 
-# 检测文章中是否有不合法的json
+'''
+检测文章中是否有不合法的文章，并生成文章id
+'''
 mysql = MySQL()
 try:
     mysql.get_connection()

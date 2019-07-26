@@ -2,7 +2,7 @@
 import time
 #等待元素控件
 from selenium.webdriver.support.ui import WebDriverWait
-from appium import webdriver
+from appium_autotest import webdriver
 from handle_mysql import MySQL
 import pickle
 import os
@@ -27,7 +27,6 @@ desired_caps = {
 server = 'http://localhost:4723/wd/hub'
 driver = webdriver.Remote(server, desired_caps)
 wait = WebDriverWait(driver, 10)
-
 
 def get_size(driver):
     x = driver.get_window_size()['width']

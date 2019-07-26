@@ -10,7 +10,7 @@ import os
 desired_caps = {
   "platformName": "Android",
   "platformVersion": "7.1.2",
-  "deviceName": "127.0.0.1:62028",
+  "deviceName": "127.0.0.1:62029",
   # "platformVersion": "7.0",
   # "deviceName": "59428cdc",
   "appPackage": "com.luojilab.player",

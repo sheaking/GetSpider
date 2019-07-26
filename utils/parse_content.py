@@ -3,7 +3,6 @@ import json
 
 def get_content_list(param, ext_info):
     '''
-
     :param param:
     :param ext_info:
     :return:
@@ -58,11 +57,14 @@ def handle_dedao_dict(target_list):
     for item in target_list:
         temp = item.get('value')
         # print('temp type:', type(temp))
-        if temp and not isinstance(temp,dict) and temp.count('"'):
+        if temp and not isinstance(temp, dict) and temp.count('"'):
             item['value'] = temp.replace('"','\'')
 
     temp = json.dumps(target_list).encode('gb2312').decode('unicode_escape')
     # 将神秘符号进行替换
     temp = temp.replace('	', ' ')
     temp = temp.replace('\n', '<br>')
+    temp = temp.replace('', '')
+    temp = temp.replace('\\@','')
+
     return temp
