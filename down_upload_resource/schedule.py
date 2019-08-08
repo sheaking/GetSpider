@@ -7,7 +7,7 @@ from handle_mysql import MySQL
 import time
 
 # 目前一下子下载20条数据，到resource文件夹中
-down_dedao(443890, 80)
+down_dedao(522897, 50)
 
 # 进行上传
 mysql = MySQL()
@@ -26,7 +26,7 @@ try:
                 upload_file(file_path)
                 # time.sleep(1)
             # 该文章upload字段更新,更新为已上传成功
-            mysql.update('article', 'uploaded = 1', 'article_id = %s' % dir)
+            mysql.update('article', 'uploaded = 1', 'article_id = "%s"' % dir)
         except Exception as e:
             print(e)
             # 这里写到日志里面

@@ -8,7 +8,7 @@ import multiprocessing
 监控mitmproxy是否崩溃
 这里是100秒检测一次
 '''
-def Mitmproxy_Monitor(wuc,temp):
+def mitmproxy_monitor(wuc,temp):
     print(temp)
     if temp == wuc.get_value('num'):
         print('mitmproxy崩溃了！')
@@ -20,7 +20,7 @@ def Mitmproxy_Monitor(wuc,temp):
         # 这里要执行方法，杀掉mitmdump，重启新的mitmdump
     else:
         temp = wuc.get_value('num')
-    t = Timer(interval=10, function=Mitmproxy_Monitor, args=(wuc, temp))
+    t = Timer(interval=10, function=mitmproxy_monitor, args=(wuc, temp))
     t.start()
 
 

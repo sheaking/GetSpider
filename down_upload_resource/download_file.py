@@ -97,9 +97,8 @@ def down_dedao(column_id, num):
                 for content in contents:
                     if content['type'] == 'audio':
                         resource_list.append(content['audio']['mp3_play_url'])
-                    elif content['type'] == 'image':
-                        if content.get('src'):
-                            resource_list.append(content.get('src'))
+                    elif content['type'] == 'image' and content.get('src'):
+                        resource_list.append(content.get('src'))
 
                 # 先创建目录
                 os.mkdir(os.path.join(os.path.abspath('resource'), str(id)))

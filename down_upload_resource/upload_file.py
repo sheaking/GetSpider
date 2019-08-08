@@ -21,9 +21,9 @@ def upload_file(path,current_count = 1,max_retry_count = 3):
     '''
     if current_count <= max_retry_count:
         try:
-            tokenUrl = "http://qiniu.systoon.com/getToken.php"
+            token_url = "http://qiniu.systoon.com/getToken.php"
             DOMAIN = "http://apr.qiniu.toon.mobi/"
-            token = requests.get(tokenUrl)
+            token = requests.get(token_url)
             l = os.path.getsize(path)
             file_name = os.path.split(path)[1]
 

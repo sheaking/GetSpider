@@ -79,20 +79,9 @@ class MySQL():
             elif table == 'ext_attribute':
                 sql_filter = 'article_id = \"' + str(data.get('article_id')) + '\"' + ' and ' + 'attribute_name=\"' + str(data.get('attribute_name')) + '\"'
 
-            elif table == 'article':
+            elif table == 'article' or table == 'article_author' or table == 'article_category' or table == 'article_column' or table == 'article_source':
                 sql_filter = 'article_id = \"' + str(data.get('article_id')) + '\"'
 
-            elif table == 'article_author':
-                sql_filter = 'article_id = \"' + str(data.get('article_id')) + '\"'
-
-            elif table == 'article_category':
-                sql_filter = 'article_id = \"' + str(data.get('article_id')) + '\"'
-
-            elif table == 'article_column':
-                sql_filter = 'article_id = \"' + str(data.get('article_id')) + '\"'
-
-            elif table == 'article_source':
-                sql_filter = 'article_id = \"' + str(data.get('article_id')) + '\"'
 
             if sql_filter:
                 if self.select(table,'count(1)', sql_filter) == ((0,),):

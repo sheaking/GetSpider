@@ -10,7 +10,7 @@ import os
 desired_caps = {
   "platformName": "Android",
   "platformVersion": "7.1.2",
-  "deviceName": "127.0.0.1:62029",
+  "deviceName": "127.0.0.1:62030",
   # "platformVersion": "7.0",
   # "deviceName": "59428cdc",
   "appPackage": "com.luojilab.player",
@@ -85,13 +85,17 @@ def crawl_column(driver, crawled_article):
     if wait.until(lambda x: x.find_element_by_class_name("android.support.v7.widget.RecyclerView")):
         # rv_flat_list = driver.find_element_by_id("com.luojilab.player:id/rv_flat_list")
         rv_flat_list = driver.find_element_by_class_name("android.support.v7.widget.RecyclerView")
-        articles = rv_flat_list.find_elements_by_class_name("android.widget.LinearLayout")
+        articles = rv_flat_list.find_elements_by_id("com.luojilab.player:id/tv_title")
+        if len(articles) == 0:
+            rv_flat_list = driver.find_element_by_id("com.luojilab.player:id/rv_flat_list")
+            articles = rv_flat_list.find_elements_by_id("com.luojilab.player:id/tv_title")
+
         for article in articles:
             try:
-                title = article.find_element_by_id("com.luojilab.player:id/tv_title").get_attribute("text")
+                title = article.get_attribute("text")
                 if title not in crawled_article:
                     # 点击进去爬取
-                    article.find_element_by_id("com.luojilab.player:id/tv_title").click()
+                    article.click()
 
                     time.sleep(3)
                     # 进行文章爬取
